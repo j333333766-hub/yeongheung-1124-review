@@ -1,0 +1,202 @@
+/* =========================================================
+   영흥고 11/24 — 읽·걷·쓰 테마 (11/21, 동부 오디세이 theme.css 를 이 사이트 구조에 맞춰 옮김)
+   인천광역시교육청 상징 세 색: 주황 #f4731c(읽음) · 초록 #00a363(걷구) · 파랑 #1a64b7 / 하늘 #40c1e6(쓰득)
+   yh.css(·admin.css) 뒤에 불러 덮는다. 화면 배치는 그대로, 모양만 바꾼다.
+   ========================================================= */
+:root {
+  --or: #f4731c; --or-d: #c4560c; --or-soft: #fff1e6;
+  --gr: #00a363; --gr-d: #007a4a; --gr-soft: #e3f6ec;
+  --bl: #1a64b7; --bl-d: #0f4a8c; --bl-soft: #e8f1fb; --sky: #40c1e6;
+  --bg: #fbf8f1; --line: #e8e1d3; --ink: #1d2433; --soft: #5f6676; --faint: #8f8a7e;
+  --brand: #1a64b7; --ok: #00a363; --ok-bg: #e3f6ec;
+  --shadow: 0 6px 22px rgba(60, 50, 20, .07);
+}
+
+/* 바탕: 옅은 모눈 */
+html {
+  background:
+    linear-gradient(rgba(26, 100, 183, .035) 1px, transparent 1px) 0 0 / 28px 28px,
+    linear-gradient(90deg, rgba(26, 100, 183, .035) 1px, transparent 1px) 0 0 / 28px 28px,
+    var(--bg);
+  background-attachment: fixed; min-height: 100%;
+}
+body { background: transparent; }
+:focus-visible { outline-color: var(--sky); }
+
+/* ---------- 머리줄: 주황 | 초록 | 파랑 세 띠 + 아래 물결 (높이는 한 줄 그대로) ---------- */
+.top, .a-top {
+  border: 0;
+  background: linear-gradient(90deg, var(--or) 0 33.4%, var(--gr) 33.4% 66.7%, var(--bl) 66.7% 100%);
+}
+.top { height: 58px; }
+/* 아래 물결: 세 띠 색 그대로 아래로 흘러내림(마스크) */
+.top::after, .a-top::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -12px; height: 13px; pointer-events: none;
+  background: linear-gradient(90deg, var(--or) 0 33.4%, var(--gr) 33.4% 66.7%, var(--bl) 66.7% 100%);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='13' viewBox='0 0 40 13'%3E%3Cpath d='M0 0 H40 V3 Q30 13 20 3 T0 3Z' fill='%23000'/%3E%3C/svg%3E") repeat-x 0 0 / 40px 13px;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='13' viewBox='0 0 40 13'%3E%3Cpath d='M0 0 H40 V3 Q30 13 20 3 T0 3Z' fill='%23000'/%3E%3C/svg%3E") repeat-x 0 0 / 40px 13px;
+}
+.top::before { /* 반짝이 */
+  content: '✦'; position: absolute; left: 41%; top: 6px; font-size: 15px; color: #fff; opacity: .8; pointer-events: none;
+  text-shadow: 140px 26px 0 rgba(255, 255, 255, .55);
+}
+.brand > img:first-child, .a-title > img:first-child {
+  width: 36px; height: 36px; background: #fff; border-radius: 50%; padding: 5px; box-shadow: 0 3px 0 rgba(0, 0, 0, .15);
+}
+.brand b, .a-title b { color: #fff; font-weight: 900; letter-spacing: -.3px; text-shadow: 0 2px 0 rgba(0, 0, 0, .18); }
+.brand-sub { color: #fff; opacity: .95; font-weight: 600; text-shadow: 0 1px 0 rgba(0, 0, 0, .15); }
+.top-chars { display: flex; align-items: flex-end; gap: 3px; flex: none; margin-left: 6px; }
+.top-chars img { height: 40px; width: auto; filter: drop-shadow(0 3px 0 rgba(0, 0, 0, .15)); animation: hop 2.4s ease-in-out infinite; }
+.top-chars img:nth-child(2) { animation-delay: .3s; }
+.top-chars img:nth-child(3) { animation-delay: .6s; height: 31px; }
+@media (max-width: 1100px) { .top-chars { display: none; } }
+
+/* 머리줄 오른쪽 단추: 흰 알약 */
+.intro-btn { border: 0; background: rgba(255, 255, 255, .96); box-shadow: 0 3px 0 rgba(0, 0, 0, .12); }
+.intro-btn .ti-go { color: var(--bl-d); font-weight: 700; }
+.who { background: rgba(255, 255, 255, .96); color: var(--bl-d); font-weight: 800; box-shadow: 0 3px 0 rgba(0, 0, 0, .12); }
+.top-btn { background: #fff; color: var(--or-d); box-shadow: 0 3px 0 rgba(0, 0, 0, .15); font-weight: 800; }
+.top-btn.ghost { background: rgba(255, 255, 255, .18); color: #fff; border: 1.5px solid rgba(255, 255, 255, .7); }
+.timer-pill { background: #fff; color: var(--bl-d); box-shadow: 0 3px 0 rgba(0, 0, 0, .12); }
+.timer-pill.soon { background: #fff3e0; color: var(--or-d); }
+.present-bar { margin-top: 12px; }
+
+@keyframes hop { 0%, 100% { transform: translateY(0); } 30% { transform: translateY(-5px); } 45% { transform: translateY(0) scale(1.04, .96); } }
+@keyframes peek { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-4px) rotate(-4deg); } }
+
+/* 물결이 내용 위에 걸리므로 위 여백 조금 */
+.page { padding-top: 22px; }
+
+/* ---------- 카드: 위 색 띠 + 귀퉁이 캐릭터 ---------- */
+.card { border: 0; border-top: 6px solid var(--c, var(--sky)); border-radius: 18px; box-shadow: var(--shadow); }
+.join { --c: var(--or); position: relative; margin-top: 54px; }
+.join::after, .room-card::after, .login::after {
+  content: ''; position: absolute; right: 18px; top: -42px; width: 66px; height: 66px; pointer-events: none;
+  background: url(/img/ch-read.png) center bottom / contain no-repeat; filter: drop-shadow(0 3px 0 rgba(0, 0, 0, .12));
+  animation: peek 4s ease-in-out infinite;
+}
+.join-hero h1 { font-weight: 900; letter-spacing: -.4px; }
+.room-card { --c: var(--gr); position: relative; margin-top: 30px; }
+.room-card::after { background-image: url(/img/ch-walk.png); top: -36px; width: 56px; height: 56px; }
+.room-head h2 { font-weight: 900; }
+.login { --c: var(--or); position: relative; }
+
+/* 활동 카드: 교시 색(읽음 주황·걷구 초록·쓰득 파랑)으로 위 띠 */
+.step { --c: var(--pc); position: relative; }
+.step-head { border-left: 0; padding-left: 0; padding-right: 70px; }
+.step-tag { display: inline-block; background: color-mix(in srgb, var(--pc) 13%, #fff); color: color-mix(in srgb, var(--pc) 80%, #000); border-radius: 99px; padding: 1px 11px; font-weight: 800; }
+.step h2 { font-weight: 900; letter-spacing: -.4px; }
+.step::after {
+  content: ''; position: absolute; right: 20px; top: 12px; width: 52px; height: 52px; pointer-events: none;
+  background: var(--chimg, url(/img/ch-read.png)) center bottom / contain no-repeat; opacity: .95;
+  filter: drop-shadow(0 3px 0 rgba(0, 0, 0, .1)); animation: peek 4s ease-in-out infinite;
+}
+.step[style*="#00a363"] { --chimg: url(/img/ch-walk.png); }
+.step[style*="#1a64b7"] { --chimg: url(/img/ch-write.png); }
+.note { background: var(--bl-soft); }
+
+/* ---------- 단추: 톡 튀는 아래 그림자 ---------- */
+.btn { border: 0; background: #f3eee3; color: var(--ink); box-shadow: 0 3px 0 #ddd3bf; transition: transform .1s, box-shadow .1s, filter .1s; }
+.btn:hover:not(:disabled) { background: #efe8da; }
+.btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 #ddd3bf; }
+.btn.primary { background: var(--bl); color: #fff; box-shadow: 0 4px 0 var(--bl-d); }
+.btn.primary:hover:not(:disabled) { background: var(--bl); filter: brightness(1.07); }
+.btn.primary:active:not(:disabled) { box-shadow: 0 1px 0 var(--bl-d); }
+.btn.big { border-radius: 12px; }
+.btn:disabled { box-shadow: none; }
+.link-btn { border: 2px solid var(--line); box-shadow: 0 3px 0 #e6dfcf; }
+.link-btn:hover { border-color: var(--sky); }
+
+/* 입력칸 */
+.field input, .post-in, .modal-box textarea, textarea { border: 1.5px solid var(--line); background: #fff; }
+.field input:focus, .post-in:focus, textarea:focus { outline: none; border-color: var(--sky); box-shadow: 0 0 0 3px rgba(64, 193, 230, .2); }
+.gender b { border-color: var(--line); }
+.gender input:checked + b { border-color: var(--or); background: var(--or-soft); color: var(--or-d); }
+
+/* ---------- 왼쪽 활동 목록 ---------- */
+.nav-item:hover { border-color: var(--line); }
+.nav-item.on { border: 2px solid var(--sky); box-shadow: 0 3px 0 var(--bl-soft); }
+.nav-item.now .nav-no, .nav-now { background: var(--or); }
+.nav-prog.full { color: var(--gr-d); }
+
+/* 프롬프트·할 일·고르기 */
+.prompt { border: 2px solid #f7c79f; border-radius: 14px; background: #fff; }
+.prompt-head { background: var(--or-soft); }
+.prompt-head b { color: var(--or-d); }
+.tk { border: 2px solid #efe9dc; border-radius: 14px; }
+.tk.is-done { border-color: #a8e2c4; }
+.tk-done { border-color: #cfc4ae; }
+.tk-done.on { background: var(--gr); border-color: var(--gr); }
+.tk-hint summary { color: var(--bl-d); }
+.tk-hint div { background: #f8f4ea; }
+.tk-ack { color: var(--gr-d); }
+.all-done { color: var(--gr-d); }
+.check { border: 2px solid #efe9dc; border-radius: 14px; }
+.opt.mine { border-color: var(--sky); background: var(--bl-soft); }
+.chip.on { background: var(--or); border-color: var(--or); }
+
+/* 벽 */
+.post { border: 2px solid #efe9dc; border-radius: 14px; background: #fffdf7; }
+.w-card { border-top: 5px solid var(--or); border-radius: 12px; }
+.w-card:nth-child(3n+2) { border-top-color: var(--gr); }
+.w-card:nth-child(3n) { border-top-color: var(--bl); }
+.w-card.site { border: 2px solid #efe9dc; border-top: 5px solid var(--or); }
+.keycard { border-color: var(--or); background: var(--or-soft); }
+.f-node { background: var(--gr-soft); border-color: #bfe5cf; }
+.f-arrow { color: var(--gr-d); }
+.tool-fold summary { color: var(--bl-d); }
+.tk-shot:hover { border-color: var(--sky); }
+
+/* 창·알림 */
+.modal-box { border-top: 6px solid var(--or); border-radius: 18px; }
+.call-box { border-top: 8px solid var(--or); }
+.toast { background: var(--ink); }
+
+/* 아래 */
+.rws-foot { text-align: center; color: var(--faint); font-size: 13px; padding: 4px 16px 24px; }
+.rws { font-weight: 900; letter-spacing: -.3px; color: var(--soft); }
+.rws b:nth-child(1) { color: var(--or); } .rws b:nth-child(2) { color: var(--gr); } .rws b:nth-child(3) { color: var(--bl); }
+
+/* ---------- 강사 화면 ---------- */
+.a-top { position: sticky; }
+.a-top .pill { background: rgba(255, 255, 255, .95); color: var(--bl-d); }
+.a-top .pill.on { background: #fff; color: var(--gr-d); }
+.a-tools .btn { background: rgba(255, 255, 255, .96); color: var(--ink); box-shadow: 0 3px 0 rgba(0, 0, 0, .15); }
+.a-tools .btn:hover:not(:disabled) { background: #fff; }
+.a-steps { top: 51px; background: rgba(251, 248, 241, .96); border-bottom: 1.5px solid var(--line); padding-top: 16px; }
+.a-step { border: 2px solid var(--line); border-radius: 12px; }
+.a-step:hover { border-color: var(--pc); }
+.a-step.on { box-shadow: 0 3px 0 color-mix(in srgb, var(--pc) 70%, #000); }
+.a-main, .side-box { border: 0; border-top: 6px solid var(--gr); border-radius: 18px; box-shadow: var(--shadow); }
+.side-box:first-child { border-top-color: var(--or); }
+.side-box:nth-child(2) { border-top-color: var(--bl); }
+.board-bar h2 { font-weight: 900; }
+.board-menu { border: 2px solid var(--line); }
+.board-menu button:hover, .board-menu button.on { background: var(--or-soft); }
+.kpi { background: var(--gr-soft); }
+.kpi b { color: var(--gr-d); }
+
+@media (max-width: 620px) {
+  .top::before { display: none; }
+  .brand img:first-child { width: 30px; height: 30px; padding: 4px; }
+  .join::after, .room-card::after { width: 52px; height: 52px; top: -34px; }
+  .step::after { width: 40px; height: 40px; right: 12px; }
+  .step-head { padding-right: 46px; }
+}
+@media (prefers-reduced-motion: reduce) { .top-chars img, .join::after, .room-card::after, .login::after, .step::after { animation: none !important; } }
+
+/* 11/21 강사 화면 오른쪽 칸 안의 학생 화면(?present&embed): 머리줄·활동 목록·아래 줄 숨김 */
+body.embed .top, body.embed .present-bar, body.embed .rws-foot, body.embed .steps-nav { display: none !important; }
+body.embed .page { padding: 10px 10px 30px; }
+body.embed .layout { grid-template-columns: 1fr; }
+body.embed .step { padding: 14px 14px 18px; }
+
+/* 11/21 야간: 빨리 끝낸 학생용 도전 칩 */
+.more { border: 2px dashed #f4b183; background: #fff8f1; border-radius: 14px; padding: 12px 14px; margin-top: 4px; }
+.more-head { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; margin-bottom: 8px; }
+.more-head b { color: #c2540a; font-size: 15.5px; }
+.more-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.more-chip { border: 1.5px solid #f4b183; background: #fff; color: #7a3a06; border-radius: 999px; padding: 6px 13px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+.more-chip:hover { background: #ffe9d6; }
+.more-chip.copied { border-color: #00a363; }
+.more-chip:disabled { opacity: .75; cursor: default; }

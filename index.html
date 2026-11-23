@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1a64b7">
+  <meta name="description" content="2026년 11월 24일 인천영흥고 「바이브코딩으로 나만의 앱서랍 만들기」 수업 복기 — 뽀모도로 타이머·html 연결·나만의 앱서랍·나만의 서버·나이스 시간표·Gemini 공부 상담앱·Netlify 올리기, 프롬프트와 따라 하기 그림">
+  <title>나만의 앱서랍 수업 복기 · 2026.11.24</title>
+  <link rel="icon" href="emoji/1f4f1.svg">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" href="css/review.css">
+</head>
+<body>
+  <header class="band">
+    <div class="band-inner">
+      <div>
+        <div class="kicker">인천영흥고 수학·과학동아리 · 수업 복기</div>
+        <h1>바이브코딩으로 나만의 앱서랍 만들기</h1>
+        <div class="sub">2026. 11. 24.(화) 1~3교시 · 강사 조창현(구월중학교)</div>
+      </div>
+      <div class="chars" aria-hidden="true"><img src="img/ch-read.png" alt=""><img src="img/ch-walk.png" alt=""><img src="img/ch-write.png" alt=""></div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="card intro">
+      <h2>수업을 한눈에</h2>
+      <div class="stats" id="stats"></div>
+      <nav class="toc" id="toc" aria-label="단계 목차"></nav>
+      <p class="muted">수업 날 쓴 실시간 사이트를 정리한 복기판이에요. 입장·선생님 화면 같은 실시간 기능과 <b>API 키·실습 계정</b>은 뺐어요. 프롬프트의 키 자리에는 <b>내가 직접 발급받은 키</b>를 넣어요. 수업 결과는 이름과 연결되지 않은 합계로만 실었어요.</p>
+      <div class="keys-help">
+        <b>🔑 집에서 다시 해 보려면 키가 필요해요</b>
+        <ul>
+          <li><b>Gemini API 키</b> (공부 상담앱): <a href="https://aistudio.google.com/api-keys" target="_blank" rel="noopener">Google AI Studio ↗</a> → Create API key</li>
+          <li><b>나이스 인증키</b> (시간표 앱): <a href="https://open.neis.go.kr/portal/guide/apiIntroPage.do" target="_blank" rel="noopener">나이스 교육정보 개방 포털 ↗</a> → 인증키 신청 → 마이페이지에서 복사</li>
+          <li>키는 비밀번호와 같아요. 친구에게 보내거나 웹(Netlify)에 올리지 않아요.</li>
+        </ul>
+      </div>
+    </section>
+
+    <div id="steps"></div>
+
+    <footer class="foot">바이브코딩으로 나만의 앱서랍 만들기 · 2026. 11. 24. 인천영흥고등학교<br>이모지 그림: Twemoji (CC-BY 4.0)</footer>
+  </main>
+
+  <div class="viewer hidden" id="viewer" role="dialog" aria-modal="true" aria-labelledby="viewer-title">
+    <div class="viewer-bar">
+      <b id="viewer-title"></b>
+      <button type="button" id="viewer-close" aria-label="닫기">닫기 ✕</button>
+    </div>
+    <div class="viewer-body" id="viewer-body"></div>
+  </div>
+  <div class="toast hidden" id="toast"></div>
+  <a class="to-top" href="#" aria-label="맨 위로">↑</a>
+  <script type="module" src="js/review.js"></script>
+</body>
+</html>

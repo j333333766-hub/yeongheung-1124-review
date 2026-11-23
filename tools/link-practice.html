@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>파일 간 연결 구조 실습</title>
+<style>
+  :root{
+    --ink:#1c2733;
+    --paper:#f6f3ec;
+    --line:#c9bfa8;
+    --accent:#2f6f6a;
+    --accent-soft:#e2ede9;
+    --gold:#b8862f;
+    --index:#7a4ba0;
+    --a01:#2f6f6a;
+    --a02:#c25a3a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.65;
+    padding:32px 18px 64px;
+  }
+  .wrap{max-width:820px;margin:0 auto;}
+
+  header{
+    text-align:center;
+    padding:24px 0 36px;
+    border-bottom:2px solid var(--ink);
+    margin-bottom:40px;
+  }
+  header .eyebrow{
+    font-size:.78rem;letter-spacing:.28em;text-transform:uppercase;
+    color:var(--accent);font-weight:700;margin-bottom:14px;
+  }
+  header h1{
+    font-family:"Georgia",serif;
+    font-size:2.1rem;line-height:1.25;font-weight:700;letter-spacing:-.01em;
+  }
+  header p{margin-top:14px;color:#5a5344;font-size:.98rem;}
+
+  /* 연결 구조 다이어그램 */
+  .map{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:26px 20px 20px;
+    margin-bottom:44px;
+  }
+  .map h2{
+    font-family:"Georgia",serif;font-size:1.15rem;margin-bottom:8px;text-align:center;
+  }
+  .map .legend{
+    text-align:center;font-size:.82rem;color:#7a715c;margin-bottom:6px;
+  }
+  .map .legend b.fwd{color:var(--accent);}
+  .map .legend b.back{color:var(--a02);}
+  .diagram{width:100%;height:auto;display:block;}
+  .loop-note{
+    text-align:center;margin-top:8px;font-size:.85rem;color:#7a715c;
+    border-top:1px dashed var(--line);padding-top:14px;
+  }
+
+  /* 단계 카드 */
+  .step{
+    background:#fff;
+    border:1px solid var(--line);
+    border-left:5px solid var(--accent);
+    border-radius:12px;
+    padding:24px 22px;
+    margin-bottom:26px;
+  }
+  .step-head{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+  .badge{
+    background:var(--accent);color:#fff;font-weight:700;
+    width:34px;height:34px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    font-size:.95rem;
+  }
+  .step h3{font-family:"Georgia",serif;font-size:1.2rem;}
+  .fname{
+    display:inline-block;font-family:"SFMono-Regular",Consolas,monospace;
+    background:var(--accent-soft);color:var(--accent);
+    padding:1px 8px;border-radius:5px;font-size:.9rem;font-weight:700;
+  }
+  .desc{color:#4a4436;font-size:.95rem;margin:10px 0 18px;}
+  .desc ul{margin:8px 0 0 18px;}
+  .desc li{margin-bottom:3px;}
+
+  .prompt-box{
+    position:relative;
+    background:#20282f;color:#e8ede9;
+    border-radius:10px;
+    padding:18px 18px 18px;
+    font-family:"SFMono-Regular",Consolas,monospace;
+    font-size:.83rem;line-height:1.55;
+    white-space:pre-wrap;
+    overflow-x:auto;
+  }
+  .copy-btn{
+    position:absolute;top:12px;right:12px;
+    background:var(--gold);color:#fff;border:none;
+    padding:7px 14px;border-radius:7px;font-size:.8rem;font-weight:700;
+    cursor:pointer;transition:background .15s,transform .1s;
+    font-family:inherit;
+  }
+  .copy-btn:hover{background:#a1751f;}
+  .copy-btn:active{transform:scale(.94);}
+  .copy-btn.done{background:var(--accent);}
+  .prompt-label{
+    font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;
+    color:#7a715c;font-weight:700;margin-bottom:8px;
+  }
+  footer{
+    text-align:center;color:#8a8069;font-size:.82rem;margin-top:40px;
+  }
+  @media (max-width:520px){
+    header h1{font-size:1.6rem;}
+    .copy-btn{position:static;display:block;margin:0 0 12px auto;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">HTML 실습 과제</div>
+    <h1>파일 간 연결 구조 만들기</h1>
+    <p>같은 폴더에 세 개의 HTML 파일을 만들어 서로 이동하는 흐름을 완성합니다.</p>
+  </header>
+
+  <!-- 연결 구조 -->
+  <section class="map">
+    <h2>연결 구조 한눈에 보기</h2>
+    <p class="legend"><b class="fwd">━━ 다음 · START</b>&nbsp;&nbsp;&nbsp;<b class="back">╌╌ 이전 · 처음으로</b></p>
+    <svg class="diagram" viewBox="0 0 720 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="index, A01, A02 파일의 연결 구조 다이어그램">
+
+      <!-- 앞으로 가는 화살표 (다음/START) : 흰 면 + 초록 테두리 -->
+      <g fill="#ffffff" stroke="#2f6f6a" stroke-width="2.5" stroke-linejoin="round">
+        <path d="M176,112 h58 v-11 l26,19 -26,19 v-11 h-58 z"/>
+        <path d="M456,112 h58 v-11 l26,19 -26,19 v-11 h-58 z"/>
+      </g>
+
+      <!-- 돌아가는 화살표 (이전) : 흰 면 + 주황 테두리, 왼쪽 방향 -->
+      <g fill="#ffffff" stroke="#c25a3a" stroke-width="2.5" stroke-linejoin="round">
+        <path d="M264,166 h-58 v-11 l-26,19 26,19 v-11 h58 z"/>
+        <path d="M544,166 h-58 v-11 l-26,19 26,19 v-11 h58 z"/>
+      </g>
+
+      <!-- A02 -> index 순환 : 흰 면 + 주황 테두리 곡선 화살표 -->
+      <path d="M620,210 C620,300 620,300 360,300 C170,300 128,300 120,246"
+            stroke="#c25a3a" stroke-width="2.5" fill="none"/>
+      <path d="M120,238 l-11,17 h22 z" fill="#ffffff" stroke="#c25a3a" stroke-width="2.5" stroke-linejoin="round"/>
+      <text x="368" y="292" text-anchor="middle" font-family="Georgia,serif" font-size="15" fill="#c25a3a" font-weight="700">A02의 「다음」 → index 처음으로 순환</text>
+
+      <!-- 노드: index -->
+      <rect x="30" y="100" width="140" height="88" rx="12" fill="#fff" stroke="#7a4ba0" stroke-width="2.5"/>
+      <text x="100" y="140" text-anchor="middle" font-family="Georgia,serif" font-size="18" fill="#7a4ba0" font-weight="700">index.html</text>
+      <text x="100" y="164" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#7a4ba0" opacity="0.75">START</text>
+
+      <!-- 노드: A01 -->
+      <rect x="290" y="100" width="140" height="88" rx="12" fill="#fff" stroke="#2f6f6a" stroke-width="2.5"/>
+      <text x="360" y="140" text-anchor="middle" font-family="Georgia,serif" font-size="18" fill="#2f6f6a" font-weight="700">A01.html</text>
+      <text x="360" y="164" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#2f6f6a" opacity="0.75">이전 · 다음</text>
+
+      <!-- 노드: A02 -->
+      <rect x="550" y="100" width="140" height="88" rx="12" fill="#fff" stroke="#c25a3a" stroke-width="2.5"/>
+      <text x="620" y="140" text-anchor="middle" font-family="Georgia,serif" font-size="18" fill="#c25a3a" font-weight="700">A02.html</text>
+      <text x="620" y="164" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#c25a3a" opacity="0.75">이전 · 다음</text>
+    </svg>
+    <p class="loop-note">
+      <b style="color:var(--accent)">다음</b>·START은 오른쪽으로, <b style="color:var(--a02)">이전</b>은 왼쪽으로 돌아가고,
+      A02의 <b style="color:var(--a02)">다음</b>은 아래를 크게 돌아 index로 순환합니다.
+    </p>
+  </section>
+
+  <!-- 1단계 -->
+  <section class="step">
+    <div class="step-head">
+      <div class="badge">1</div>
+      <h3><span class="fname">index.html</span> 만들기</h3>
+    </div>
+    <div class="desc">
+      시작 페이지입니다. 화면 가운데 START 버튼 하나만 둡니다.
+      <ul>
+        <li><b>START</b> 버튼 → <span class="fname">A01.html</span> 로 이동</li>
+      </ul>
+    </div>
+    <div class="prompt-label">복사용 프롬프트</div>
+    <div class="prompt-box">
+      <button class="copy-btn" onclick="copyPrompt(this,'p1')">복사</button>
+<span id="p1">index.html 파일을 만들어줘.
+- 화면 정중앙에 "START" 버튼 하나만 배치한다.
+- START 버튼을 누르면 같은 폴더의 A01.html 페이지로 이동한다.
+- 버튼은 크고 보기 좋게, 배경과 색을 깔끔하게 스타일링한다.
+- 전체를 하나의 완성된 HTML 파일로 작성한다.</span></div>
+  </section>
+
+  <!-- 2단계 -->
+  <section class="step">
+    <div class="step-head">
+      <div class="badge">2</div>
+      <h3><span class="fname">A01.html</span> 만들기</h3>
+    </div>
+    <div class="desc">
+      가운데 페이지입니다. 이전·다음 버튼 두 개를 둡니다.
+      <ul>
+        <li><b>이전</b> 버튼 → <span class="fname">index.html</span> 로 이동</li>
+        <li><b>다음</b> 버튼 → <span class="fname">A02.html</span> 로 이동</li>
+      </ul>
+    </div>
+    <div class="prompt-label">복사용 프롬프트</div>
+    <div class="prompt-box">
+      <button class="copy-btn" onclick="copyPrompt(this,'p2')">복사</button>
+<span id="p2">A01.html 파일을 만들어줘.
+- 화면에 "이전" 버튼과 "다음" 버튼 두 개를 나란히 배치한다.
+- "이전" 버튼을 누르면 같은 폴더의 index.html 페이지로 이동한다.
+- "다음" 버튼을 누르면 같은 폴더의 A02.html 페이지로 이동한다.
+- 현재 페이지가 A01임을 알 수 있는 제목을 화면 가운데 표시한다.
+- 전체를 하나의 완성된 HTML 파일로 작성한다.</span></div>
+  </section>
+
+  <!-- 3단계 -->
+  <section class="step">
+    <div class="step-head">
+      <div class="badge">3</div>
+      <h3><span class="fname">A02.html</span> 만들기</h3>
+    </div>
+    <div class="desc">
+      마지막 페이지입니다. 이전·다음 버튼 두 개를 둡니다.
+      <ul>
+        <li><b>이전</b> 버튼 → <span class="fname">A01.html</span> 로 이동</li>
+        <li><b>다음</b> 버튼 → <span class="fname">index.html</span> 로 이동(처음으로)</li>
+      </ul>
+    </div>
+    <div class="prompt-label">복사용 프롬프트</div>
+    <div class="prompt-box">
+      <button class="copy-btn" onclick="copyPrompt(this,'p3')">복사</button>
+<span id="p3">A02.html 파일을 만들어줘.
+- 화면에 "이전" 버튼과 "다음" 버튼 두 개를 나란히 배치한다.
+- "이전" 버튼을 누르면 같은 폴더의 A01.html 페이지로 이동한다.
+- "다음" 버튼을 누르면 같은 폴더의 index.html 페이지로 이동한다(처음으로 돌아감).
+- 현재 페이지가 A02임을 알 수 있는 제목을 화면 가운데 표시한다.
+- 전체를 하나의 완성된 HTML 파일로 작성한다.</span></div>
+  </section>
+
+  <footer>세 파일을 같은 폴더에 저장한 뒤 index.html을 열어 흐름을 확인하세요.</footer>
+</div>
+
+<script>
+function copyPrompt(btn, id){
+  const text = document.getElementById(id).innerText;
+  navigator.clipboard.writeText(text).then(()=>{
+    const orig = btn.textContent;
+    btn.textContent = "복사됨 ✓";
+    btn.classList.add("done");
+    setTimeout(()=>{btn.textContent = orig; btn.classList.remove("done");},1500);
+  }).catch(()=>{
+    // 클립보드 API 미지원 시 대체
+    const ta = document.createElement("textarea");
+    ta.value = text; document.body.appendChild(ta);
+    ta.select(); document.execCommand("copy"); document.body.removeChild(ta);
+    btn.textContent = "복사됨 ✓"; btn.classList.add("done");
+    setTimeout(()=>{btn.textContent = "복사"; btn.classList.remove("done");},1500);
+  });
+}
+</script>
+</body>
+</html>

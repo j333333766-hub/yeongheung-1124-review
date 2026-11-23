@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>배경화면 프롬프트 복사기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ===================================================================
+     배경화면 프롬프트 복사기 — 배경화면_프롬프트.html
+     앱서랍(index.html)에 쓸 '배경화면.png' 를 Gemini 로 만들기 위한
+     프롬프트를 고르고, 고치고, 클립보드로 복사합니다.
+     =================================================================== */
+
+  :root {
+    --panel:        rgba(14, 18, 25, 0.92);
+    --panel-line:   rgba(255,255,255,0.11);
+    --text:         #F2F5F8;
+    --text-soft:    #A6AFBD;
+    --text-faint:   #737E8E;
+    --accent:       #FF7A59;
+    --accent-ink:   #23100A;
+    --good:         #56D6A8;
+    --field:        rgba(255,255,255,0.06);
+    --field-line:   rgba(255,255,255,0.13);
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; margin: 0; }
+
+  body {
+    font-family: 'Gowun Dodum', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    color: var(--text);
+    background-color: #0B0E14;
+    background-image:
+      radial-gradient(ellipse 80% 60% at 20% 0%, rgba(61,123,236,0.20), transparent 60%),
+      radial-gradient(ellipse 70% 60% at 90% 100%, rgba(255,122,89,0.16), transparent 60%);
+    background-attachment: fixed;
+    overflow-x: hidden;
+  }
+
+  .stage {
+    min-height: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .panel {
+    width: 100%;
+    max-width: 720px;
+    background: var(--panel);
+    -webkit-backdrop-filter: blur(26px) saturate(1.15);
+    backdrop-filter: blur(26px) saturate(1.15);
+    border: 1px solid var(--panel-line);
+    border-radius: 26px;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.06) inset,
+      0 30px 70px rgba(0,0,0,0.55);
+    padding: 26px 28px 24px;
+  }
+
+  .panel-head {
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--panel-line);
+    margin-bottom: 22px;
+  }
+  h1 {
+    font-family: 'Jua', 'Apple SD Gothic Neo', sans-serif;
+    font-weight: 400;
+    font-size: clamp(21px, 4.4vw, 28px);
+    line-height: 1.3;
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+  }
+  .sub {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--text-faint);
+    word-break: keep-all;
+  }
+  .sub b { color: var(--text-soft); font-weight: 400; }
+
+  .field-label {
+    display: block;
+    font-size: 12.5px;
+    color: var(--text-soft);
+    margin-bottom: 9px;
+  }
+
+  /* ---------- 프롬프트 종류 고르기 ---------- */
+  .presets {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 7px;
+    margin-bottom: 20px;
+  }
+  .preset {
+    font-family: 'Gowun Dodum', sans-serif;
+    font-size: 13px;
+    color: var(--text-soft);
+    background: var(--field);
+    border: 1px solid transparent;
+    border-radius: 11px;
+    padding: 11px 10px;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .preset:hover { background: rgba(255,255,255,0.12); color: var(--text); }
+  .preset[aria-pressed="true"] {
+    background: rgba(255,122,89,0.20);
+    border-color: var(--accent);
+    color: var(--text);
+  }
+  .preset:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+  /* ---------- 프롬프트 칸 ---------- */
+  .box { position: relative; }
+  textarea {
+    width: 100%;
+    min-height: 320px;
+    resize: vertical;
+    font-family: 'Gowun Dodum', 'Apple SD Gothic Neo', sans-serif;
+    font-size: 14.5px;
+    line-height: 1.75;
+    color: var(--text);
+    background: var(--field);
+    border: 1px solid var(--field-line);
+    border-radius: 14px;
+    padding: 16px 16px 18px;
+    white-space: pre-wrap;
+  }
+  textarea:focus { outline: 2px solid var(--accent); border-color: transparent; }
+
+  .meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 9px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-faint);
+  }
+
+  /* ---------- 버튼 ---------- */
+  .actions {
+    display: flex;
+    gap: 9px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  .actions button {
+    font-family: 'Gowun Dodum', sans-serif;
+    font-size: 14.5px;
+    border-radius: 12px;
+    padding: 13px 16px;
+    cursor: pointer;
+    border: 1px solid var(--field-line);
+    transition: filter 0.15s ease, background 0.15s ease;
+  }
+  .actions button:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+  .btn-primary {
+    flex: 2 1 200px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    border-color: var(--accent);
+    font-size: 15.5px;
+  }
+  .btn-primary:hover { filter: brightness(1.08); }
+  .btn-primary.done {
+    background: var(--good);
+    border-color: var(--good);
+    color: #06251A;
+  }
+  .btn-ghost {
+    flex: 1 1 110px;
+    background: transparent;
+    color: var(--text-soft);
+  }
+  .btn-ghost:hover { background: var(--field); color: var(--text); }
+
+  .msg {
+    margin: 12px 0 0;
+    font-size: 12.8px;
+    line-height: 1.6;
+    min-height: 1.3em;
+    color: var(--good);
+    word-break: keep-all;
+  }
+  .msg.warn { color: #FF9C8C; }
+
+  /* ---------- 안내문 ---------- */
+  .hint {
+    margin: 22px 0 0;
+    padding-top: 18px;
+    border-top: 1px solid var(--panel-line);
+    font-size: 12.4px;
+    line-height: 1.8;
+    color: var(--text-faint);
+    word-break: keep-all;
+  }
+  .hint b { color: var(--text-soft); font-weight: 400; }
+  .hint ol { margin: 8px 0 0; padding-left: 19px; }
+  .hint li { margin-bottom: 5px; }
+  .hint code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    background: var(--field);
+    border: 1px solid var(--field-line);
+    border-radius: 4px;
+    padding: 1px 5px;
+  }
+
+  @media (max-width: 460px) {
+    .stage { padding: 20px 13px; }
+    .panel { padding: 20px 17px 18px; border-radius: 22px; }
+    textarea { min-height: 280px; font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <main class="panel">
+
+    <div class="panel-head">
+      <h1>🖼️ 배경화면 프롬프트 복사기</h1>
+      <p class="sub">
+        앱서랍(<b>index.html</b>)에 깔 <b>배경화면.png</b> 를 만드는 프롬프트예요.
+        아래에서 마음에 드는 종류를 고르고, 글을 자유롭게 고친 다음
+        <b>복사</b>를 눌러 Gemini 에 붙여넣으세요.
+      </p>
+    </div>
+
+    <span class="field-label">1. 어떤 배경으로 만들까요?</span>
+    <div class="presets" id="presets"></div>
+
+    <span class="field-label">2. 프롬프트를 고쳐 쓰세요 (대괄호 [ ] 안을 바꿔주세요)</span>
+    <div class="box">
+      <textarea id="promptBox" spellcheck="false" aria-label="프롬프트 입력 칸"></textarea>
+    </div>
+    <div class="meta">
+      <span id="count">0자</span>
+      <span id="picked">—</span>
+    </div>
+
+    <div class="actions">
+      <button class="btn-primary" id="copyBtn" type="button">📋 복사</button>
+      <button class="btn-ghost" id="resetBtn" type="button">↺ 처음으로</button>
+      <button class="btn-ghost" id="clearBtn" type="button">✕ 비우기</button>
+    </div>
+
+    <p class="msg" id="msg"></p>
+
+    <div class="hint">
+      <b>쓰는 순서</b>
+      <ol>
+        <li>프롬프트를 복사한다.</li>
+        <li>Gemini 에 붙여넣고 이미지를 만든다. (원하는 사진이 있으면 함께 올리고 “이 사진 분위기로” 라고 덧붙이면 좋아요.)</li>
+        <li>만들어진 그림을 <code>배경화면.png</code> 라는 이름으로 저장한다.</li>
+        <li><code>index.html</code> 과 <b>같은 폴더</b>에 넣고 새로고침한다.</li>
+      </ol>
+    </div>
+
+  </main>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ============== 샘플 프롬프트 (여기를 고쳐도 됩니다) ============== */
+  var COMMON_RULES =
+    '\n\n[꼭 지켜야 할 조건]\n' +
+    '- 가로형 16:9, 1920x1080 픽셀 이상의 고화질 이미지.\n' +
+    '- 화면 한가운데는 잔잔한 면(하늘, 운동장, 잔디, 넓은 바닥처럼 무늬가 적은 곳)이 오게 하고, ' +
+    '눈길을 끄는 주요 피사체는 가장자리 쪽에 배치할 것.\n' +
+    '- 밝기와 색은 자연스럽게, 사진 그대로. 일부러 어둡게 만들거나 어두운 영역을 덧칠하지 말 것.\n' +
+    '- 화면 위에 사각형·상자·반투명 판·프레임·비네팅 같은 덧씌운 도형을 절대 그리지 말 것. ' +
+    '오직 하나의 자연스러운 장면만.\n' +
+    '- 사람 얼굴, 글자, 로고, 워터마크는 넣지 말 것.\n' +
+    '- 자르거나 확대해도 어색하지 않도록 여백을 넉넉히.';
+
+  var PRESETS = [
+    {
+      key: 'school',
+      label: '🏫 우리 학교 항공사진',
+      text:
+        '내 웹페이지(스마트폰 홈 화면처럼 생긴 앱 목록 페이지)의 배경 사진을 만들어 줘.\n\n' +
+        '[장면]\n' +
+        '맑은 가을날 오전, 드론으로 내려다본 [인천영흥고등학교] 전경. ' +
+        '붉은 벽돌과 회색 벽면이 번갈아 있는 4층 학교 건물, 초록색 창틀, 옥상 한쪽의 태양광 패널, ' +
+        '건물 앞 계단과 지붕 덮인 통로, 앞쪽의 운동장, ' +
+        '건물 뒤로 낮은 산과 멀리 서해 바다가 보이는 섬마을 학교 풍경.\n\n' +
+        '[분위기]\n' +
+        '햇살이 부드럽게 드는 맑은 하늘, 파스텔 톤, 실제 사진 같은 사실적인 표현. ' +
+        '너무 화려하지 않고 단정한 느낌.' +
+        COMMON_RULES
+    },
+    {
+      key: 'night',
+      label: '🌌 밤하늘과 별',
+      text:
+        '내 웹페이지(스마트폰 홈 화면처럼 생긴 앱 목록 페이지)의 배경 그림을 만들어 줘.\n\n' +
+        '[장면]\n' +
+        '깊고 푸른 밤하늘에 은하수와 작은 별들이 흩뿌려진 풍경. ' +
+        '아래쪽에는 어두운 산 능선이 실루엣으로 얕게 깔리고, 하늘 위쪽에 은은한 보랏빛 오로라.\n\n' +
+        '[분위기]\n' +
+        '조용하고 신비로운 느낌, 남색·보라·짙은 청록의 색조. 별빛은 작고 은은하게.' +
+        COMMON_RULES
+    },
+    {
+      key: 'pastel',
+      label: '🎨 파스텔 그라데이션',
+      text:
+        '내 웹페이지(스마트폰 홈 화면처럼 생긴 앱 목록 페이지)의 배경 그림을 만들어 줘.\n\n' +
+        '[장면]\n' +
+        '구체적인 사물이 없는 추상 배경. [연보라]에서 [짙은 남색]으로 부드럽게 번지는 그라데이션에, ' +
+        '물감이 물에 퍼지듯 흐릿한 빛 덩어리가 몇 개 떠 있는 모습. 아주 옅은 필름 그레인(입자감).\n\n' +
+        '[분위기]\n' +
+        '차분하고 세련된 느낌. 무늬가 복잡하지 않고 넓고 부드럽게.' +
+        COMMON_RULES
+    },
+    {
+      key: 'desk',
+      label: '✏️ 책상 위 문구류',
+      text:
+        '내 웹페이지(스마트폰 홈 화면처럼 생긴 앱 목록 페이지)의 배경 사진을 만들어 줘.\n\n' +
+        '[장면]\n' +
+        '어두운 나무 책상을 바로 위에서 내려다본 플랫레이 사진. ' +
+        '노트, 연필, 클립, 작은 화분, 이어폰이 가장자리에 가지런히 놓여 있고 ' +
+        '가운데는 책상 면만 넓게 비어 있음.\n\n' +
+        '[분위기]\n' +
+        '따뜻한 스탠드 조명, 은은한 그림자, 사실적인 사진 느낌.' +
+        COMMON_RULES
+    }
+  ];
+  /* ================================================================ */
+
+  var presetsEl = document.getElementById('presets');
+  var box       = document.getElementById('promptBox');
+  var countEl   = document.getElementById('count');
+  var pickedEl  = document.getElementById('picked');
+  var copyBtn   = document.getElementById('copyBtn');
+  var msgEl     = document.getElementById('msg');
+
+  var current = PRESETS[0];
+  var msgTimer = null;
+
+  /* ---------- 종류 단추 만들기 ---------- */
+  PRESETS.forEach(function (p) {
+    var b = document.createElement('button');
+    b.className = 'preset';
+    b.type = 'button';
+    b.textContent = p.label;
+    b.setAttribute('aria-pressed', 'false');
+    b.addEventListener('click', function () { pick(p); });
+    presetsEl.appendChild(b);
+    p.btn = b;
+  });
+
+  function pick(p) {
+    current = p;
+    box.value = p.text;
+    PRESETS.forEach(function (o) {
+      o.btn.setAttribute('aria-pressed', String(o === p));
+    });
+    pickedEl.textContent = p.label;
+    updateCount();
+    resetCopyBtn();
+    say('');
+  }
+
+  function updateCount() {
+    countEl.textContent = box.value.length + '자';
+  }
+  box.addEventListener('input', function () { updateCount(); resetCopyBtn(); });
+
+  function say(text, isWarn) {
+    msgEl.textContent = text;
+    msgEl.className = 'msg' + (isWarn ? ' warn' : '');
+    if (msgTimer) { clearTimeout(msgTimer); msgTimer = null; }
+    if (text) { msgTimer = setTimeout(function () { msgEl.textContent = ''; }, 4000); }
+  }
+
+  function resetCopyBtn() {
+    copyBtn.classList.remove('done');
+    copyBtn.textContent = '📋 복사';
+  }
+
+  /* ---------- 복사하기 ---------- */
+  /* 파일을 그냥 더블클릭해서 열면(file://) 최신 복사 기능이 막히는
+     브라우저가 있어, 예전 방식(execCommand)까지 함께 준비해 둡니다. */
+  function legacyCopy() {
+    var ta = document.createElement('textarea');
+    ta.value = box.value;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '-1000px';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    ta.setSelectionRange(0, ta.value.length);
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  function copied() {
+    copyBtn.classList.add('done');
+    copyBtn.textContent = '✓ 복사했어요';
+    say('클립보드에 담았어요. Gemini 에 붙여넣기(Ctrl+V) 하세요.');
+    setTimeout(resetCopyBtn, 2200);
+  }
+
+  function copyFailed() {
+    box.focus();
+    box.select();
+    say('자동 복사가 막혀 있어요. 글이 선택되었으니 Ctrl+C 를 눌러주세요.', true);
+  }
+
+  copyBtn.addEventListener('click', function () {
+    var text = box.value.trim();
+    if (!text) { say('복사할 내용이 없어요. 프롬프트를 먼저 적어주세요.', true); box.focus(); return; }
+
+    if (navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext) {
+      navigator.clipboard.writeText(box.value).then(copied, function () {
+        if (legacyCopy()) { copied(); } else { copyFailed(); }
+      });
+    } else {
+      if (legacyCopy()) { copied(); } else { copyFailed(); }
+    }
+  });
+
+  /* ---------- 처음으로 / 비우기 ---------- */
+  document.getElementById('resetBtn').addEventListener('click', function () {
+    box.value = current.text;
+    updateCount();
+    resetCopyBtn();
+    say('처음 샘플로 되돌렸어요.');
+  });
+
+  document.getElementById('clearBtn').addEventListener('click', function () {
+    box.value = '';
+    updateCount();
+    resetCopyBtn();
+    box.focus();
+    say('');
+  });
+
+  /* ---------- 단축키: Ctrl(⌘) + Enter 로 복사 ---------- */
+  document.addEventListener('keydown', function (ev) {
+    if ((ev.ctrlKey || ev.metaKey) && ev.key === 'Enter') {
+      ev.preventDefault();
+      copyBtn.click();
+    }
+  });
+
+  /* ---------- 시작 ---------- */
+  pick(PRESETS[0]);
+})();
+</script>
+</body>
+</html>
